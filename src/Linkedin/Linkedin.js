@@ -8,22 +8,31 @@ export class LinkedinSDK extends Component {
     callBack: PropTypes.func.isRequired,
     fields: PropTypes.string.isRequired,
     className: PropTypes.string,
-    textButton: PropTypes.string,
+    loginButtonText: PropTypes.string,
+    logoutButtonText: PropTypes.string,
     buttonType: PropTypes.string,
-    icon: PropTypes.object
+    icon: PropTypes.object,
+    getOAuthToken: PropTypes.bool,
   }
 
   state = {
-    loading: false
+    loading: false,
+    isLoggedIn: false
   }
 
   static defaultProps = {
-    textButton: 'Login with Linkedin',
+    loginButtonText: 'Login with Linkedin',
+    logoutButtonText: 'Logout from Linkedin',
     buttonType: 'button',
-    className: 'linkedin-sdk'
+    className: 'linkedin-sdk',
+    getOAuthToken: false,
   }
 
   componentDidMount() {
+    if (typeof window === 'undefined') {
+      return
+    }
+
     const { clientId } = this.props
     this.loadSDK(clientId)
   }
@@ -45,30 +54,47 @@ export class LinkedinSDK extends Component {
   }
 
   callBack = () => {
-    const { fields } = this.props
+    this.setState({ loading: true })
+    const { fields, callBack, getOAuthToken } = this.props
+    const { isLoggedIn } = this.state
+
+    if (window.IN['User'] && isLoggedIn) {
+      this.setState({ loading: false, isLoggedIn: false })
+      return callBack('logout')
+    }
     window.IN.API.Raw(`/people/~${fields}`).result(r => {
-      this.setState({ loading: false })
-      this.props.callBack(r)
+      this.setState({ loading: false, isLoggedIn: true })
+      const response = { ...r }
+      if (getOAuthToken) response.oauthToken = window.IN.ENV.auth.oauth_token
+      callBack(response)
     })
   }
 
-  authorize = e => {
-    this.setState({ loading: true })
-    window.IN.User.authorize(this.callBack, '')
+  handleAuthorization = e => {
+    if (window.IN.User.isAuthorized()) {
+      return window.IN.User.logout(this.callBack, '')
+    }
+    return window.IN.User.authorize(this.callBack, '')
   }
 
   render() {
-    const { textButton, className, buttonType, icon } = this.props
-    const { loading } = this.state
+    const {
+      loginButtonText,
+      logoutButtonText,
+      className,
+      buttonType,
+      icon
+    } = this.props
+    const { loading, isLoggedIn } = this.state
     return (
       <button
-        onClick={this.authorize}
+        onClick={this.handleAuthorization}
         type={buttonType}
         className={className}
         disabled={loading}
       >
         {icon}
-        {textButton}
+        {(isLoggedIn && logoutButtonText) || loginButtonText}
       </button>
     )
   }

@@ -29,9 +29,11 @@ ReactDOM.render(
     callBack={responseLinkedin}
     fields=":(id,num-connections,picture-url)"
     className={'className'}
-    textButton={'Login with Linkedin'}
+    loginButtonText={'Login with Linkedin'}
+    logoutButtonText={'Logout from Linkedin'}
     buttonType={'button'}
     icon={<Icon />}
+    getOAuthToken
   />,
   document.getElementById('demo')
 )
@@ -59,9 +61,11 @@ class MyComponent extends React.Component {
         callBack={responseLinkedin}
         fields=":(id,num-connections,picture-urls::(original))"
         className={'className'}
-        textButton={'Login with Linkedin'}
+        loginButtonText={'Login with Linkedin'}
+        logoutButtonText={'Logout from Linkedin'}
         buttonType={'button'}
         icon={<Icon />}
+        getOAuthToken
       />
     )
   }
@@ -72,12 +76,14 @@ export default MyComponent
 
 ## Parameters
 
-|   params   |  value   |    default value    |
-| :--------: | :------: | :-----------------: |
-|  clientId  |  string  |      Required       |
-|   fields   |  string  |      Required       |
-|  callback  | function |      Required       |
-| className  |  string  |        none         |
-| textButton |  string  | Login with Linkedin |
-| buttonType |  string  |       button        |
-|    icon    |  string  |        none         |
+|      params      |  value   |    default value     |
+| :--------------: | :------: | :------------------: |
+|     clientId     |  string  |       Required       |
+|      fields      |  string  |       Required       |
+|     callback     | function |       Required       |
+|    className     |  string  |         none         |
+| loginButtonText  |  string  | Login with Linkedin  |
+| logoutButtonText |  string  | Logout from Linkedin |
+|    buttonType    |  string  |        button        |
+|       icon       |  string  |         none         |
+|  getOAuthToken   |   bool   |        false         |
